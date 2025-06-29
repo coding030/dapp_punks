@@ -12,8 +12,17 @@ describe('NFT', () => {
   const SYMBOL = 'DP'
   const COST = ether(10)
   const MAX_SUPPLY = 25
+  const BASE_URI = 'ipfs://bafybeidpuzq54zqnmgq5lsbegxwrwkgrt72545l3pyj6c4y3qsprfamu6u/'
 
-  let nft
+  let nft,
+      deployer,
+      minter
+
+  beforeEach(async () => {
+    let accounts = await ethers.getSigners()
+    deployer = accounts[0]
+    minter = accounts[1]
+  })
 
   describe('Deployment', () => {
 //    const ALLOW_MINTING_ON = '1893499200'
@@ -21,7 +30,7 @@ describe('NFT', () => {
 
     beforeEach(async () => {
       const NFT = await ethers.getContractFactory('NFT')
-      nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON) 
+      nft = await NFT.deploy(NAME, SYMBOL, COST, MAX_SUPPLY, ALLOW_MINTING_ON, BASE_URI) 
     })
 
     it('has correct name', async () => {
@@ -42,6 +51,14 @@ describe('NFT', () => {
 
     it('returns the allowed minting time', async () => {
       expect(await nft.allowMintingOn()).to.equal(ALLOW_MINTING_ON)
+    })
+
+    it('returns the baseURI', async () => {
+      expect(await nft.baseURI()).to.equal(BASE_URI)
+    })
+
+    it('returns the owner', async () => {
+      expect(await nft.owner()).to.equal(deployer.address)
     })
   })
 
