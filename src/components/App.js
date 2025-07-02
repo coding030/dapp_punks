@@ -8,6 +8,7 @@ import preview from '../preview.png'
 // Components
 import Navigation from './Navigation';
 import Data from './Data';
+import Mint from './Mint';
 import Loading from './Loading';
 
 // ABIs: Import your contract ABIs here
@@ -92,6 +93,12 @@ function App() {
                 totalSupply={totalSupply} 
                 cost={cost}
                 balance={balance}
+              />
+              <Mint
+                provider={provider}
+                nft={nft}
+                cost={cost}
+                setIsLoading={setIsLoading}
               />
             </Col>
           </Row>

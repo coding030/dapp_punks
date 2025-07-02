@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "./ERC721Enumerable.sol";
 import "./Ownable.sol";
+//import "@openzeppelin/contracts/security/Pausable.sol";
 
 contract NFT is ERC721Enumerable, Ownable {
 	using Strings for uint256;
@@ -10,8 +11,14 @@ contract NFT is ERC721Enumerable, Ownable {
 	uint256 public cost;
 	uint256 public maxSupply;
 	uint256 public allowMintingOn;
+	uint256 public maxAmount = 3;
 	string public baseURI;
 	string public baseExtension = ".json";
+	bool public mintingPaused = false;
+	bool public onlyWhitelisted = true;
+
+	mapping(address => uint256) public amountNFTs;
+	mapping(address => bool) public whitelist;
 
 	event Mint(uint256 amount, address minter);
 	event Withdraw(uint256 amount, address owner);
@@ -30,13 +37,34 @@ contract NFT is ERC721Enumerable, Ownable {
 		baseURI = _baseURI;
 	}
 
-	function mint(uint256 _mintAmount) public payable {
+    modifier whenMintingNotPaused() {
+        require(!mintingPaused, "Minting is paused");
+        _;
+    }
+
+	function mint(uint256 _mintAmount) public payable whenMintingNotPaused {
 		// Only allow minting after specified time
 		require(block.timestamp >= allowMintingOn);
 		// Must mint at least 1 token
 		require(_mintAmount > 0);
 		// Require enough payment
 		require(msg.value >= cost * _mintAmount);
+		// Cannot mint more than max amount of tokens at once
+		require(_mintAmount <= maxAmount);
+		// Require having max amount of tokens in total
+//		require(
+//			amountNFTs[msg.sender] <= maxAmount, 
+//			string(abi.encodePacked("Cannot exceed ", Strings.toString(maxAmount)))
+//		);
+//		require(balanceOf(address(msg.sender)) <=  maxAmount);
+		require(
+			amountNFTs[msg.sender] + _mintAmount <= maxAmount,
+			"Exceeds max allowed per address"
+		);
+
+		if (onlyWhitelisted) {
+			require(whitelist[msg.sender], "Address not whitelisted");
+		}
 
 		uint256 supply = totalSupply();
 
@@ -47,6 +75,8 @@ contract NFT is ERC721Enumerable, Ownable {
 		for(uint256 i = 1; i <= _mintAmount; i++) {
 		  _safeMint(msg.sender, supply + i);			
 		}
+
+		amountNFTs[msg.sender] += _mintAmount;
 
 		emit Mint(_mintAmount, msg.sender);
 
@@ -87,4 +117,23 @@ contract NFT is ERC721Enumerable, Ownable {
 		cost = _newCost;
 	}
 
+    function pauseMinting() public onlyOwner {
+        mintingPaused = true;
+    }    
+
+    function resumeMinting() public onlyOwner {
+        mintingPaused = false;
+    }
+
+    function addToWhitelist(address _white) public onlyOwner {
+    	whitelist[_white] = true;
+    }
+
+    function checkWhitelist(address _white) public view returns(bool) {
+    	return whitelist[_white];
+    }
+
+    function setOnlyWhitelisted(bool _state) public onlyOwner {
+    	onlyWhitelisted = _state;
+    }
 }
