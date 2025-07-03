@@ -10,6 +10,7 @@ import Navigation from './Navigation';
 import Data from './Data';
 import Mint from './Mint';
 import Whitelist from './Whitelist';
+import PauseMinting from './PauseMinting';
 import Loading from './Loading';
 
 // ABIs: Import your contract ABIs here
@@ -19,10 +20,12 @@ import Loading from './Loading';
  import config from '../config.json';
 
 function App() {
-  const[provider, setProvider] = useState(null)
-  const[nft, setNFT] = useState(null)
+  const [provider, setProvider] = useState(null)
+  const [nft, setNFT] = useState(null)
 
   const [account, setAccount] = useState(null)
+  const [owner, setOwner] = useState(null)
+//  const [mintingPaused, setMintingPaused] = useState(false)
 
   const [revealTime, setRevealTime] = useState(0)
   const [maxSupply, setMaxSupply] = useState(0)
@@ -45,10 +48,15 @@ function App() {
     const nft = new ethers.Contract(config[31337].nft.address, NFT_ABI, provider)
     setNFT(nft)
 
+//    setMintingPaused(await nft.mintingPaused())
+
     // Fetch accounts
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
     const account = ethers.utils.getAddress(accounts[0])
     setAccount(account)
+
+    const ownerAddress = await nft.owner()
+    setOwner(ownerAddress.toLowerCase())
 
     // Fetch countdown
     const allowMintingOn = await nft.allowMintingOn()
@@ -92,6 +100,26 @@ function App() {
     }
   }, [isLoading]);
 
+  useEffect(() => {
+    if (window.ethereum) {
+      const handleAccountsChanged = (accounts) => {
+        if (accounts.length === 0) {
+          // MetaMask locked or disconnected
+          window.location.reload();
+        } else {
+          // Account changed - reload page or reload data
+          window.location.reload();
+        }
+      };  
+
+      window.ethereum.on('accountsChanged', handleAccountsChanged);  
+
+      return () => {
+        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+      };
+    }
+  }, []);
+
   return(
     <Container>
       <Navigation account={account} />
@@ -133,8 +161,22 @@ function App() {
                 cost={cost}
                 setIsLoading={setIsLoading}
               />
-              <Whitelist
-              />
+              {account && owner && account.toLowerCase() === owner ? (
+                <>
+                  <Whitelist
+                    nft={nft}
+                    provider={provider}
+                    setIsLoading={setIsLoading}
+                  />
+                  <PauseMinting
+                    nft={nft}
+                    provider={provider}
+                    setIsLoading={setIsLoading}
+                  />
+                </>
+              ) : (
+                null
+              )}
             </Col>
           </Row>
         </>
