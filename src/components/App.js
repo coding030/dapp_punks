@@ -9,6 +9,7 @@ import preview from '../preview.png'
 import Navigation from './Navigation';
 import Data from './Data';
 import Mint from './Mint';
+import Whitelist from './Whitelist';
 import Loading from './Loading';
 
 // ABIs: Import your contract ABIs here
@@ -28,6 +29,10 @@ function App() {
   const [totalSupply, setTotalSupply] = useState(0)
   const [cost, setCost] = useState(0)
   const [balance, setBalance] = useState(0)
+  const [latestTokenId, setLatestTokenId] = useState(null)
+  const [baseURI, setBaseURI] = useState(null)
+  const [gatewayBaseURI, setGatewayBaseURI] = useState(null)
+  const [imageURL, setImageURL] = useState(null)
 
   const [isLoading, setIsLoading] = useState(true)
 
@@ -61,6 +66,23 @@ function App() {
     // Fetch balanceOf
     setBalance(await nft.balanceOf(account))
 
+    // Get token IDs owned by user
+    const tokenIds = await nft.walletOfOwner(account) 
+
+    const fetchedBaseURI = await nft.baseURI()
+    const gatewayURI = fetchedBaseURI.replace("ipfs://", "https://gateway.pinata.cloud/ipfs/")
+
+    // If they own at least one NFT, set the latest token ID
+    if (tokenIds.length > 0) {
+      const latestId = tokenIds[tokenIds.length - 1].toString()
+      const finalImageURL = gatewayURI + latestId + ".png"
+
+      setLatestTokenId(latestId)
+      setBaseURI(fetchedBaseURI)
+      setGatewayBaseURI(gatewayURI)
+      setImageURL(finalImageURL)      
+    }
+
     setIsLoading(false)
   }
 
@@ -82,7 +104,18 @@ function App() {
         <>
           <Row>
             <Col>
-              <img src={preview} alt=""/>
+              {balance > 0 ? (
+                <div className='text-center'>
+                  <img 
+                    src={imageURL}
+                    alt="Open Punk"
+                    width="400px"
+                    height="400px"
+                  />
+                </div> 
+              ) : (
+                <img src={preview} alt=""/>
+              )}
             </Col>
             <Col>
               <div className='my-4 text-center'>
@@ -99,6 +132,8 @@ function App() {
                 nft={nft}
                 cost={cost}
                 setIsLoading={setIsLoading}
+              />
+              <Whitelist
               />
             </Col>
           </Row>

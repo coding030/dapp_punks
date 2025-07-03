@@ -52,11 +52,6 @@ contract NFT is ERC721Enumerable, Ownable {
 		// Cannot mint more than max amount of tokens at once
 		require(_mintAmount <= maxAmount);
 		// Require having max amount of tokens in total
-//		require(
-//			amountNFTs[msg.sender] <= maxAmount, 
-//			string(abi.encodePacked("Cannot exceed ", Strings.toString(maxAmount)))
-//		);
-//		require(balanceOf(address(msg.sender)) <=  maxAmount);
 		require(
 			amountNFTs[msg.sender] + _mintAmount <= maxAmount,
 			"Exceeds max allowed per address"

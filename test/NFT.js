@@ -26,7 +26,8 @@ describe('NFT', () => {
 
   describe('Deployment', () => {
 //    const ALLOW_MINTING_ON = '1893499200'
-    const ALLOW_MINTING_ON = (Date.now() + 120000).toString().slice(0, 10) // 2 minutes from now
+//    const ALLOW_MINTING_ON = (Date.now() + 120000).toString().slice(0, 10) // 2 minutes from now
+    const ALLOW_MINTING_ON = (Date.now()).toString().slice(0, 10) // now
 
     beforeEach(async () => {
       const NFT = await ethers.getContractFactory('NFT')
