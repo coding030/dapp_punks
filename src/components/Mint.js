@@ -12,10 +12,28 @@ const Mint = ({ provider, nft, cost, setIsLoading }) => {
 
     try {
       const signer = await provider.getSigner()
+
+//      const paused = await nft.mintingPaused();
+//      if (paused) {
+//        window.alert("Minting is currently paused.");
+//        setIsWaiting(false)
+//        return;
+//      }
+
       const transaction = await nft.connect(signer).mint(1, { value: cost })
       await transaction.wait()
-    } catch {
-      window.alert('User rejected or transaction reverted')
+    } catch (error) {
+//      window.alert('User rejected or transaction reverted')
+      if (error.code === 4001) {
+        // EIP-1193 user rejected request error
+        window.alert('Transaction rejected by the user.');
+      } else if (error.message?.includes("minting already paused")) {
+        window.alert("Minting is already paused.");
+      } else if (error.message?.includes("only owner")) {
+        window.alert("Only the contract owner can toggle minting.");
+      } else {
+        window.alert('Transaction failed: ' + (error.reason || error.message || 'Unknown error'));
+      }
     }
 
     setIsLoading(true)

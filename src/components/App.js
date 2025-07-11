@@ -25,7 +25,7 @@ function App() {
 
   const [account, setAccount] = useState(null)
   const [owner, setOwner] = useState(null)
-//  const [mintingPaused, setMintingPaused] = useState(false)
+  const [mintingPaused, setMintingPaused] = useState(null)
 
   const [revealTime, setRevealTime] = useState(0)
   const [maxSupply, setMaxSupply] = useState(0)
@@ -57,6 +57,10 @@ function App() {
 
     const ownerAddress = await nft.owner()
     setOwner(ownerAddress.toLowerCase())
+
+    // Fetch minting paused state
+    const paused = await nft.mintingPaused();
+    setMintingPaused(paused);
 
     // Fetch countdown
     const allowMintingOn = await nft.allowMintingOn()
@@ -147,7 +151,24 @@ function App() {
             </Col>
             <Col>
               <div className='my-4 text-center'>
-                <Countdown date={parseInt(revealTime)} className='h2'/>
+                <Countdown 
+                  date={parseInt(revealTime)}
+                  renderer={({ days, hours, minutes, seconds, completed }) => {
+                    if (completed) {
+                      if (mintingPaused){
+                        return <span className="h2">Minting is paused</span>                        
+                      }
+                      return <span className="h2">Minting is now live!</span>
+                    } else {
+                      return (
+                        <span>
+                          Minting starts in: {days}d {hours}h {minutes}m {seconds}s
+                        </span>
+                      )
+                    }
+                  }}
+                  className='h2'
+                />
               </div>
               <Data 
                 maxSupply={maxSupply} 
@@ -172,6 +193,8 @@ function App() {
                     nft={nft}
                     provider={provider}
                     setIsLoading={setIsLoading}
+                    mintingPaused={mintingPaused}
+                    setMintingPaused={setMintingPaused}
                   />
                 </>
               ) : (
