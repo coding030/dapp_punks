@@ -26,6 +26,7 @@ function App() {
   const [account, setAccount] = useState(null)
   const [owner, setOwner] = useState(null)
   const [mintingPaused, setMintingPaused] = useState(null)
+  const [isWhitelisted, setIsWhitelisted] = useState(null)
 
   const [revealTime, setRevealTime] = useState(0)
   const [maxSupply, setMaxSupply] = useState(0)
@@ -48,8 +49,6 @@ function App() {
     const nft = new ethers.Contract(config[31337].nft.address, NFT_ABI, provider)
     setNFT(nft)
 
-//    setMintingPaused(await nft.mintingPaused())
-
     // Fetch accounts
     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
     const account = ethers.utils.getAddress(accounts[0])
@@ -58,9 +57,13 @@ function App() {
     const ownerAddress = await nft.owner()
     setOwner(ownerAddress.toLowerCase())
 
+    const isWhitelisted = await nft.checkWhitelist(account);
+    setIsWhitelisted(isWhitelisted)
+
     // Fetch minting paused state
     const paused = await nft.mintingPaused();
     setMintingPaused(paused);
+//    setMintingPaused(await nft.mintingPaused())
 
     // Fetch countdown
     const allowMintingOn = await nft.allowMintingOn()
@@ -181,6 +184,7 @@ function App() {
                 nft={nft}
                 cost={cost}
                 setIsLoading={setIsLoading}
+                isWhitelisted={isWhitelisted}
               />
               {account && owner && account.toLowerCase() === owner ? (
                 <>

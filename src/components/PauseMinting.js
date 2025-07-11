@@ -48,17 +48,7 @@ const PauseMinting = ({nft, provider, setIsLoading, mintingPaused, setMintingPau
 
     } catch (error) {
       console.log("Error toggling minting:", error)
-
-      if (error.code === 4001) {
-        // EIP-1193 user rejected request error
-        window.alert('Transaction rejected by the user.');
-      } else if (error.message?.includes("minting already paused")) {
-        window.alert("Minting is already paused.");
-      } else if (error.message?.includes("only owner")) {
-        window.alert("Only the contract owner can toggle minting.");
-      } else {
-        window.alert('Transaction failed: ' + (error.reason || error.message || 'Unknown error'));
-      }
+      window.alert('User rejected or transaction reverted')
     }
 
     setIsWaiting(false)
