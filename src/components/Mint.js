@@ -3,7 +3,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 
-const Mint = ({ provider, nft, cost, setIsLoading, isWhitelisted }) => {
+const Mint = ({ provider, nft, cost, setIsLoading, isWhitelisted, mintingPaused }) => {
   const [isWaiting, setIsWaiting] = useState(false)
 
   const mintHandler = async (e) => {
@@ -39,23 +39,34 @@ const Mint = ({ provider, nft, cost, setIsLoading, isWhitelisted }) => {
     setIsLoading(true)
   }
 
+  let mintButton;
+  if (mintingPaused) {
+    mintButton = (
+      <Button variant="primary" type="submit" style={{ width: '100%' }} disabled>
+        Mint
+      </Button>
+    );
+  } else if (!isWhitelisted) {
+    mintButton = (
+      <Button variant="primary" type="submit" style={{ width: '100%' }} disabled>
+        Address not whitelisted. Minting disabled.
+      </Button>
+    );
+  } else {
+    mintButton = (
+      <Button variant="primary" type="submit" style={{ width: '100%' }}>
+        Mint
+      </Button>
+    );
+  }
+
   return(
     <Form onSubmit={mintHandler} style={{ maxWidth: '450px', margin: '50px auto' }}>
       {isWaiting ? (
         <Spinner animation="border" style={{ display: 'block', margin: '0 auto' }} />
       ) : (
         <Form.Group>
-          <Button 
-            variant="primary" 
-            type="submit" 
-            style={{ width: '100%' }}
-            disabled={!isWhitelisted}
-          >
-            {!isWhitelisted ?
-              "Address not whitelisted. Minting disabled." : 
-              "Mint"
-            }
-          </Button>
+          {mintButton}
         </Form.Group>
       )}
 

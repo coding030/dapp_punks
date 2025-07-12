@@ -185,6 +185,7 @@ function App() {
                 cost={cost}
                 setIsLoading={setIsLoading}
                 isWhitelisted={isWhitelisted}
+                mintingPaused={mintingPaused}
               />
               {account && owner && account.toLowerCase() === owner ? (
                 <>
