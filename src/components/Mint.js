@@ -1,10 +1,23 @@
 import { useState } from 'react';
+import { BigNumber } from 'ethers';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 
-const Mint = ({ provider, nft, cost, setIsLoading, isWhitelisted, mintingPaused }) => {
+const Mint = ({ 
+  provider, 
+  nft, 
+  cost, 
+  setIsLoading, 
+  isWhitelisted, 
+  mintingPaused,
+  maxSupply,
+  totalSupply,
+  balance,
+  maxPerWallet
+  }) => {
   const [isWaiting, setIsWaiting] = useState(false)
+  const [amount, setAmount] = useState("")
 
   const mintHandler = async (e) => {
     e.preventDefault()
@@ -13,24 +26,21 @@ const Mint = ({ provider, nft, cost, setIsLoading, isWhitelisted, mintingPaused 
     try {
       const signer = await provider.getSigner()
 
-//      const paused = await nft.mintingPaused();
-//      if (paused) {
-//        window.alert("Minting is currently paused.");
-//        setIsWaiting(false)
-//        return;
-//      }
+      const mintAmount = parseInt(amount)
+      const totalCost = cost.mul(mintAmount)
+      console.log("Minting", mintAmount, "NFTs for", totalCost.toString(), "wei");
 
-      const transaction = await nft.connect(signer).mint(1, { value: cost })
+      if (isNaN(mintAmount) || mintAmount <= 0) {
+        window.alert("Please enter a valid mint amount.");
+        setIsWaiting(false);
+        return;
+      }
+
+      const transaction = await nft.connect(signer).mint(mintAmount, { value: totalCost })
       await transaction.wait()
     } catch (error) {
-//      window.alert('User rejected or transaction reverted')
       if (error.code === 4001) {
-        // EIP-1193 user rejected request error
         window.alert('Transaction rejected by the user.');
-      } else if (error.message?.includes("minting already paused")) {
-        window.alert("Minting is already paused.");
-      } else if (error.message?.includes("only owner")) {
-        window.alert("Only the contract owner can toggle minting.");
       } else {
         window.alert('Transaction failed: ' + (error.reason || error.message || 'Unknown error'));
       }
@@ -66,6 +76,12 @@ const Mint = ({ provider, nft, cost, setIsLoading, isWhitelisted, mintingPaused 
         <Spinner animation="border" style={{ display: 'block', margin: '0 auto' }} />
       ) : (
         <Form.Group>
+          <Form.Control
+            type='text'
+            placeholder='Enter amount to mint'
+            className='my-2'
+            onChange={(e) => setAmount(e.target.value)}
+          />
           {mintButton}
         </Form.Group>
       )}

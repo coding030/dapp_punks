@@ -30,6 +30,7 @@ function App() {
 
   const [revealTime, setRevealTime] = useState(0)
   const [maxSupply, setMaxSupply] = useState(0)
+  const [maxPerWallet, setMaxPerWallet] = useState(0)
   const [totalSupply, setTotalSupply] = useState(0)
   const [cost, setCost] = useState(0)
   const [balance, setBalance] = useState(0)
@@ -37,6 +38,7 @@ function App() {
   const [baseURI, setBaseURI] = useState(null)
   const [gatewayBaseURI, setGatewayBaseURI] = useState(null)
   const [imageURL, setImageURL] = useState(null)
+  const [ownedTokenIds, setOwnedTokenIds] = useState([])
 
   const [isLoading, setIsLoading] = useState(true)
 
@@ -83,6 +85,9 @@ function App() {
 
     // Get token IDs owned by user
     const tokenIds = await nft.walletOfOwner(account) 
+
+    // Array of all token IDs as strings
+    setOwnedTokenIds(tokenIds.map(id => id.toString()));
 
     const fetchedBaseURI = await nft.baseURI()
     const gatewayURI = fetchedBaseURI.replace("ipfs://", "https://gateway.pinata.cloud/ipfs/")
@@ -143,10 +148,25 @@ function App() {
                 <div className='text-center'>
                   <img 
                     src={imageURL}
-                    alt="Open Punk"
+                    alt="Latest Minted NFT"
                     width="400px"
                     height="400px"
                   />
+                  <div className="mt-4">
+                    <h5>Your NFT Collection:</h5>
+                    <div className="d-flex flex-wrap justify-content-center gap-3 mt-2">
+                      {ownedTokenIds.map((id) => (
+                        <img
+                          key={id}
+                          src={`${gatewayBaseURI}${id}.png`}
+                          alt={`NFT #${id}`}
+                          width="150"
+                          height="150"
+                          style={{ borderRadius: "10px", border: "1px solid #ccc" }}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </div> 
               ) : (
                 <img src={preview} alt=""/>
@@ -186,6 +206,10 @@ function App() {
                 setIsLoading={setIsLoading}
                 isWhitelisted={isWhitelisted}
                 mintingPaused={mintingPaused}
+                maxSupply={maxSupply}
+                totalSupply={totalSupply}
+                balance={balance}
+                maxPerWallet={maxPerWallet}
               />
               {account && owner && account.toLowerCase() === owner ? (
                 <>
