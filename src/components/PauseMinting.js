@@ -16,7 +16,7 @@ const PauseMinting = ({nft, provider, setIsLoading, mintingPaused, setMintingPau
     };
 
     fetchPauseState();
-  }, [nft]);
+  }, [nft, setMintingPaused]);
 
   const toggleMinting = async () => {
     setIsWaiting(true)
