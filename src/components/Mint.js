@@ -13,7 +13,7 @@ const Mint = ({
   mintingPaused,
   maxSupply,
   totalSupply,
-  balance,
+  userMinted,
   maxPerWallet
   }) => {
   const [isWaiting, setIsWaiting] = useState(false)
@@ -32,6 +32,20 @@ const Mint = ({
 
       if (isNaN(mintAmount) || mintAmount <= 0) {
         window.alert("Please enter a valid mint amount.");
+        setIsWaiting(false);
+        return;
+      }
+
+      // Don't allow more than max per wallet
+      if (userMinted + mintAmount > maxPerWallet) {
+        window.alert(`You can mint up to ${maxPerWallet} NFTs in total. You've already minted ${userMinted}.`);
+        setIsWaiting(false);
+        return;
+      }      
+
+      // Don't allow more than max supply
+      if (totalSupply + mintAmount > maxSupply) {
+        window.alert("Not enough NFTs remaining to mint that amount.");
         setIsWaiting(false);
         return;
       }

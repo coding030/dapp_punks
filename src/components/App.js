@@ -31,6 +31,7 @@ function App() {
   const [revealTime, setRevealTime] = useState(0)
   const [maxSupply, setMaxSupply] = useState(0)
   const [maxPerWallet, setMaxPerWallet] = useState(0)
+  const [userMinted, setUserMinted] = useState(0)
   const [totalSupply, setTotalSupply] = useState(0)
   const [cost, setCost] = useState(0)
   const [balance, setBalance] = useState(0)
@@ -70,6 +71,12 @@ function App() {
     // Fetch countdown
     const allowMintingOn = await nft.allowMintingOn()
     setRevealTime(allowMintingOn.toString() + '000')
+
+    // Fetch maxPerWallet
+    setMaxPerWallet(await nft.maxAmount())
+
+    const userMinted = await nft.amountNFTs(account);
+    setUserMinted(parseInt(userMinted.toString()));
 
     // Fetch maxSupply
     setMaxSupply(await nft.maxSupply())
@@ -208,7 +215,7 @@ function App() {
                 mintingPaused={mintingPaused}
                 maxSupply={maxSupply}
                 totalSupply={totalSupply}
-                balance={balance}
+                userMinted={userMinted}
                 maxPerWallet={maxPerWallet}
               />
               {account && owner && account.toLowerCase() === owner ? (
