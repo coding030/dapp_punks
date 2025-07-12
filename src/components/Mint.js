@@ -4,12 +4,12 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Spinner from 'react-bootstrap/Spinner';
 
-const Mint = ({ 
-  provider, 
-  nft, 
-  cost, 
-  setIsLoading, 
-  isWhitelisted, 
+const Mint = ({
+  provider,
+  nft,
+  cost,
+  setIsLoading,
+  isWhitelisted,
   mintingPaused,
   maxSupply,
   totalSupply,
@@ -26,9 +26,8 @@ const Mint = ({
     try {
       const signer = await provider.getSigner()
 
-      const mintAmount = parseInt(amount)
+      const mintAmount = BigNumber.from(amount)
       const totalCost = cost.mul(mintAmount)
-      console.log("Minting", mintAmount, "NFTs for", totalCost.toString(), "wei");
 
       if (isNaN(mintAmount) || mintAmount <= 0) {
         window.alert("Please enter a valid mint amount.");
@@ -37,14 +36,14 @@ const Mint = ({
       }
 
       // Don't allow more than max per wallet
-      if (userMinted + mintAmount > maxPerWallet) {
+      if (userMinted.add(mintAmount).gt(maxPerWallet)) {
         window.alert(`You can mint up to ${maxPerWallet} NFTs in total. You've already minted ${userMinted}.`);
         setIsWaiting(false);
         return;
-      }      
+      }
 
       // Don't allow more than max supply
-      if (totalSupply + mintAmount > maxSupply) {
+      if (totalSupply.add(mintAmount).gt(maxSupply)) {
         window.alert("Not enough NFTs remaining to mint that amount.");
         setIsWaiting(false);
         return;

@@ -66,7 +66,6 @@ function App() {
     // Fetch minting paused state
     const paused = await nft.mintingPaused();
     setMintingPaused(paused);
-//    setMintingPaused(await nft.mintingPaused())
 
     // Fetch countdown
     const allowMintingOn = await nft.allowMintingOn()
@@ -76,7 +75,7 @@ function App() {
     setMaxPerWallet(await nft.maxAmount())
 
     const userMinted = await nft.amountNFTs(account);
-    setUserMinted(parseInt(userMinted.toString()));
+    setUserMinted(userMinted);
 
     // Fetch maxSupply
     setMaxSupply(await nft.maxSupply())
@@ -91,7 +90,7 @@ function App() {
     setBalance(await nft.balanceOf(account))
 
     // Get token IDs owned by user
-    const tokenIds = await nft.walletOfOwner(account) 
+    const tokenIds = await nft.walletOfOwner(account)
 
     // Array of all token IDs as strings
     setOwnedTokenIds(tokenIds.map(id => id.toString()));
@@ -107,7 +106,7 @@ function App() {
       setLatestTokenId(latestId)
       setBaseURI(fetchedBaseURI)
       setGatewayBaseURI(gatewayURI)
-      setImageURL(finalImageURL)      
+      setImageURL(finalImageURL)
     }
 
     setIsLoading(false)
@@ -129,9 +128,9 @@ function App() {
           // Account changed - reload page or reload data
           window.location.reload();
         }
-      };  
+      };
 
-      window.ethereum.on('accountsChanged', handleAccountsChanged);  
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
 
       return () => {
         window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
@@ -153,7 +152,7 @@ function App() {
             <Col>
               {balance > 0 ? (
                 <div className='text-center'>
-                  <img 
+                  <img
                     src={imageURL}
                     alt="Latest Minted NFT"
                     width="400px"
@@ -174,19 +173,19 @@ function App() {
                       ))}
                     </div>
                   </div>
-                </div> 
+                </div>
               ) : (
                 <img src={preview} alt=""/>
               )}
             </Col>
             <Col>
               <div className='my-4 text-center'>
-                <Countdown 
+                <Countdown
                   date={parseInt(revealTime)}
                   renderer={({ days, hours, minutes, seconds, completed }) => {
                     if (completed) {
                       if (mintingPaused){
-                        return <span className="h2">Minting is paused</span>                        
+                        return <span className="h2">Minting is paused</span>
                       }
                       return <span className="h2">Minting is now live!</span>
                     } else {
@@ -200,9 +199,9 @@ function App() {
                   className='h2'
                 />
               </div>
-              <Data 
-                maxSupply={maxSupply} 
-                totalSupply={totalSupply} 
+              <Data
+                maxSupply={maxSupply}
+                totalSupply={totalSupply}
                 cost={cost}
                 balance={balance}
               />

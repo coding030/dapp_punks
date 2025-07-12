@@ -3,7 +3,6 @@ import Button from 'react-bootstrap/Button';
 
 const PauseMinting = ({nft, provider, setIsLoading, mintingPaused, setMintingPaused}) => {
   const [isWaiting, setIsWaiting] = useState(false);
-//  const [mintingPaused, setMintingPaused] = useState(null);
 
   // Fetch pause state on mount
   useEffect(() => {
@@ -52,13 +51,12 @@ const PauseMinting = ({nft, provider, setIsLoading, mintingPaused, setMintingPau
     }
 
     setIsWaiting(false)
-//    setIsLoading(true)
-  }  
+  }
 
   return (
     <div className="text-center my-3">
-      <Button 
-        onClick={toggleMinting} 
+      <Button
+        onClick={toggleMinting}
         disabled={isWaiting || mintingPaused === null}
         variant={mintingPaused ? "success" : "danger"}
       >

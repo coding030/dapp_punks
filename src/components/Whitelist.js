@@ -15,7 +15,6 @@ const Whitelist = ({nft, provider, setIsLoading}) => {
   	try {
       if (!ethers.utils.isAddress(wlAddress)) {
         alert('Invalid address!');
-//        setIsLoading(false);
         return;
       }
 
@@ -32,7 +31,6 @@ const Whitelist = ({nft, provider, setIsLoading}) => {
   	  window.alert('User rejected or transaction reverted')
   	}
 
-//  	setIsLoading(true)
       setIsWaiting(false);
       setIsLoading(false);
   }
