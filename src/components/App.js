@@ -35,8 +35,6 @@ function App() {
   const [totalSupply, setTotalSupply] = useState(0)
   const [cost, setCost] = useState(0)
   const [balance, setBalance] = useState(0)
-//  const [latestTokenId, setLatestTokenId] = useState(null)
-//  const [baseURI, setBaseURI] = useState(null)
   const [gatewayBaseURI, setGatewayBaseURI] = useState(null)
   const [imageURL, setImageURL] = useState(null)
   const [ownedTokenIds, setOwnedTokenIds] = useState([])
@@ -103,8 +101,6 @@ function App() {
       const latestId = tokenIds[tokenIds.length - 1].toString()
       const finalImageURL = gatewayURI + latestId + ".png"
 
-//      setLatestTokenId(latestId)
-//      setBaseURI(fetchedBaseURI)
       setGatewayBaseURI(gatewayURI)
       setImageURL(finalImageURL)
     }
